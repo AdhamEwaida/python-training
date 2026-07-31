@@ -22,3 +22,15 @@ Run the Day 2 tests with:
 ```powershell
 python -m pytest
 ```
+
+### Day 3
+- Student grade storage and validation
+- Top-three ranking using `sorted` and a lambda expression
+- Pass/fail transformation using a dictionary comprehension
+- Pytest coverage for sorting, transformations, and invalid data
+
+Run the grade report with:
+
+```powershell
+python grades.py
+```
