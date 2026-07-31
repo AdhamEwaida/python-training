@@ -34,3 +34,27 @@ Run the grade report with:
 ```powershell
 python grades.py
 ```
+
+### Day 4
+- In-memory command-line contact book using a dictionary of dictionaries
+- Case-insensitive O(1) average name lookup with `dict.get`
+- O(n) phone-number search using iteration
+- Sorted contact listing and defensive copies
+- Set union and intersection for comparing contact-book names
+
+Run the contact book with:
+
+```powershell
+python contact_book.py
+```
+
+#### Complexity analysis
+
+| Operation | Time complexity | Reason |
+|---|---:|---|
+| Add contact | O(1) average | Dictionary insertion by normalized name |
+| Search by name | O(1) average | Direct dictionary lookup with `dict.get` |
+| Search by phone | O(n) | Contacts may all need to be scanned |
+| List contacts alphabetically | O(n log n) | Contacts are sorted by name |
+| Name-set union | O(n + m) | Both sets must be combined |
+| Name-set intersection | O(min(n, m)) average | Membership checks use hash sets |
