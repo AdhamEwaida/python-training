@@ -58,3 +58,29 @@ python contact_book.py
 | List contacts alphabetically | O(n log n) | Contacts are sorted by name |
 | Name-set union | O(n + m) | Both sets must be combined |
 | Name-set intersection | O(min(n, m)) average | Membership checks use hash sets |
+
+### Day 5
+- Refactored the contact book into a `contacts` package
+- Added validated JSON persistence in `contacts.json`
+- Added custom storage exceptions and CLI error handling
+- Added password-strength validation with `WeakPasswordError`
+- Added pytest coverage for persistence, corrupt data, CLI saving, and passwords
+
+Run the persistent contact book with:
+
+```powershell
+python contact_book.py
+```
+
+The contact package is organized as follows:
+
+```text
+contacts/
+├── __init__.py
+├── manager.py
+└── utils.py
+```
+
+A strong password must contain at least eight characters, one uppercase letter,
+one number, and one special character. Invalid passwords raise
+`WeakPasswordError`.
