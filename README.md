@@ -84,3 +84,22 @@ contacts/
 A strong password must contain at least eight characters, one uppercase letter,
 one number, and one special character. Invalid passwords raise
 `WeakPasswordError`.
+
+### Day 6
+- Built a command-line student management system
+- Added student registration and grade updates with validation
+- Added average calculation and top-student ranking
+- Added JSON and CSV exports
+- Added pytest coverage for valid and invalid cases
+
+Run the project with:
+
+```powershell
+python student_manager.py
+```
+
+Run all tests with:
+
+```powershell
+python -m pytest
+```
