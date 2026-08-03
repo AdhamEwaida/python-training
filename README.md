@@ -103,3 +103,19 @@ Run all tests with:
 ```powershell
 python -m pytest
 ```
+
+## Week 2 – Advanced Python and Flask Foundations
+
+### Day 7
+- Added an object-oriented `Student` class with name, student ID, and grades
+- Used the shared class variable `school_name` to demonstrate class state
+- Added `add_grade()` and `get_average()` instance methods
+- Added readable `__str__()` and developer-focused `__repr__()` representations
+- Added pytest coverage for construction, independent instance state, validation,
+  averages, and string representations
+
+Try the class interactively with:
+
+```powershell
+python -c "from student import Student; print(Student('Adham', 'S1', [90, 80]))"
+```
