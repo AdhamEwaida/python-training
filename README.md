@@ -138,3 +138,18 @@ Try the Day 8 classes interactively with:
 ```powershell
 python -c "from course import Course; from student import GraduateStudent; c = Course('CS301', 'Advanced Python'); c.add_student(GraduateStudent('Adham', 'G1', 'Flask APIs')); print(c)"
 ```
+
+### Day 9
+- Added the automatically calculated `Student.gpa` property
+- Added student equality comparison based on case-insensitive student IDs
+- Made `Course` iterable while preserving enrollment order
+- Added `len(course)` support through `__len__()`
+- Added `Student.set_school_name()` as a class-method example
+- Added a validated `GraduateStudent.thesis_title` property setter
+- Extended pytest coverage for properties, equality, iteration, and class methods
+
+Iterate over a course and inspect each student's calculated GPA with:
+
+```powershell
+python -c "from course import Course; from student import Student; c = Course('CS301', 'Advanced Python'); c.add_student(Student('Adham', 'S1', [90, 80])); print([(s.name, s.gpa) for s in c])"
+```

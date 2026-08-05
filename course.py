@@ -1,5 +1,7 @@
 """Course model demonstrating composition with student objects."""
 
+from collections.abc import Iterator
+
 from student import Student
 
 
@@ -56,3 +58,9 @@ class Course:
         student_count = len(self.__students)
         suffix = "" if student_count == 1 else "s"
         return f"{self.code} - {self.title} ({student_count} student{suffix})"
+
+    def __len__(self) -> int:
+        return len(self.__students)
+
+    def __iter__(self) -> Iterator[Student]:
+        return iter(self.__students.copy())

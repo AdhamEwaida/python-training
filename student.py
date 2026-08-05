@@ -43,6 +43,11 @@ class Student:
             raise ValueError("grade must be between 0 and 100")
         return float(grade)
 
+    @classmethod
+    def set_school_name(cls, school_name: str) -> None:
+        """Set the shared school name for this class."""
+        cls.school_name = cls._clean_text(school_name, "school name")
+
     def add_grade(self, grade: int | float) -> None:
         """Validate and append a grade."""
         self.grades.append(self._clean_grade(grade))
@@ -52,6 +57,16 @@ class Student:
         if not self.grades:
             return 0.0
         return round(sum(self.grades) / len(self.grades), 2)
+
+    @property
+    def gpa(self) -> float:
+        """Return the current grade average as an automatically calculated GPA."""
+        return self.get_average()
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Student):
+            return NotImplemented
+        return self.student_id.casefold() == other.student_id.casefold()
 
     def __str__(self) -> str:
         return f"{self.name} ({self.student_id}) - Average: {self.get_average():.2f}"
@@ -74,11 +89,20 @@ class GraduateStudent(Student):
         grades: list[int | float] | None = None,
     ) -> None:
         super().__init__(name, student_id, grades)
-        self._thesis_title = self._clean_text(thesis_title, "thesis title")
+        self.thesis_title = thesis_title
+
+    @property
+    def thesis_title(self) -> str:
+        """Return the thesis title."""
+        return self._thesis_title
+
+    @thesis_title.setter
+    def thesis_title(self, value: str) -> None:
+        self._thesis_title = self._clean_text(value, "thesis title")
 
     def get_thesis_title(self) -> str:
         """Return the protected thesis title."""
-        return self._thesis_title
+        return self.thesis_title
 
     def __str__(self) -> str:
         return f"{super().__str__()} - Thesis: {self._thesis_title}"
