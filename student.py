@@ -61,3 +61,31 @@ class Student:
             f"{type(self).__name__}(name={self.name!r}, "
             f"student_id={self.student_id!r}, grades={self.grades!r})"
         )
+
+
+class GraduateStudent(Student):
+    """Represent a graduate student with an associated thesis."""
+
+    def __init__(
+        self,
+        name: str,
+        student_id: str,
+        thesis_title: str,
+        grades: list[int | float] | None = None,
+    ) -> None:
+        super().__init__(name, student_id, grades)
+        self._thesis_title = self._clean_text(thesis_title, "thesis title")
+
+    def get_thesis_title(self) -> str:
+        """Return the protected thesis title."""
+        return self._thesis_title
+
+    def __str__(self) -> str:
+        return f"{super().__str__()} - Thesis: {self._thesis_title}"
+
+    def __repr__(self) -> str:
+        return (
+            f"GraduateStudent(name={self.name!r}, "
+            f"student_id={self.student_id!r}, "
+            f"thesis_title={self._thesis_title!r}, grades={self.grades!r})"
+        )

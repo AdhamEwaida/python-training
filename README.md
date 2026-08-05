@@ -119,3 +119,22 @@ Try the class interactively with:
 ```powershell
 python -c "from student import Student; print(Student('Adham', 'S1', [90, 80]))"
 ```
+
+### Day 8
+- Extended `Student` with `GraduateStudent` using inheritance and `super()`
+- Overrode `__str__()` and `__repr__()` to include a thesis title
+- Added a `Professor` class that assigns validated grades to students
+- Added a `Course` class that contains student objects through composition
+- Demonstrated protected attributes with `_department` and `_thesis_title`
+- Demonstrated a private attribute with `Professor.__employee_id`
+- Added pytest coverage for inheritance, overriding, encapsulation, and composition
+
+Inheritance is used when one class **is a** specialized form of another class:
+`GraduateStudent` is a `Student`. Composition is used when one object **has**
+other objects: a `Course` has enrolled `Student` objects.
+
+Try the Day 8 classes interactively with:
+
+```powershell
+python -c "from course import Course; from student import GraduateStudent; c = Course('CS301', 'Advanced Python'); c.add_student(GraduateStudent('Adham', 'G1', 'Flask APIs')); print(c)"
+```
