@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Students | Student Portal{% endblock %}
+
+{% block content %}
+  <h1>Registered Students</h1>
+
+  {% if students %}
+    <ul>
+      {% for student in students %}
+        <li>
+          <strong>{{ student.name }}</strong>
+          — {{ student.email }} — {{ student.course }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No students have been registered yet.</p>
+  {% endif %}
+{% endblock %}

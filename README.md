@@ -201,3 +201,24 @@ python -m flask --app app run --debug
 
 Then open `http://127.0.0.1:5000/` or
 `http://127.0.0.1:5000/hello/Adham` in a browser.
+
+### Day 12
+- Replaced inline HTML responses with reusable Jinja templates
+- Added template inheritance and navigation through `templates/base.html`
+- Added a student registration form handled with GET and POST requests
+- Added server-side validation for names, emails, and courses
+- Stored registered students in an in-memory Python list
+- Added a student-list template using Jinja loops and conditions
+- Extended Flask test-client coverage for forms, validation, redirects, empty
+  states, and automatic HTML escaping
+
+Available pages:
+
+- `GET /` — homepage
+- `GET /hello/<name>` — dynamic greeting
+- `GET /students` — registered student list
+- `GET /students/register` — registration form
+- `POST /students/register` — process a registration
+
+Data is stored in memory and resets whenever the Flask development server is
+restarted.

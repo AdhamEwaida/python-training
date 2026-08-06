@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Student Portal{% endblock %}</title>
+  </head>
+  <body>
+    <nav>
+      <a href="{{ url_for('welcome') }}">Home</a>
+      <a href="{{ url_for('student_list') }}">Students</a>
+      <a href="{{ url_for('register_student') }}">Register</a>
+    </nav>
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>
