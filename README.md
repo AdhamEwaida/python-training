@@ -183,3 +183,21 @@ Import the models from the package's public interface:
 ```powershell
 python -c "from school import Course, Student; c = Course('CS301', 'Advanced Python'); c.add_student(Student('Adham', 'S1', [90, 80])); print(c)"
 ```
+
+### Day 11
+- Added a lightweight Flask application in `app.py`
+- Added a welcome route at `GET /`
+- Added a dynamic greeting route at `GET /hello/<name>`
+- Restricted both routes to GET requests and safely escaped URL input
+- Added Flask test-client coverage for successful responses, HTML escaping, and
+  rejected POST requests
+
+Install the dependencies and run the development server with:
+
+```powershell
+python -m pip install -r requirements.txt
+python -m flask --app app run --debug
+```
+
+Then open `http://127.0.0.1:5000/` or
+`http://127.0.0.1:5000/hello/Adham` in a browser.
