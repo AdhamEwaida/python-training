@@ -153,3 +153,33 @@ Iterate over a course and inspect each student's calculated GPA with:
 ```powershell
 python -c "from course import Course; from student import Student; c = Course('CS301', 'Advanced Python'); c.add_student(Student('Adham', 'S1', [90, 80])); print([(s.name, s.gpa) for s in c])"
 ```
+
+### Day 10
+- Refactored the object-oriented student system into a `school` package
+- Added a single public package interface for `Student`, `GraduateStudent`,
+  `Course`, and `Professor`
+- Kept the original top-level modules as compatibility imports
+- Added pinned development dependencies in `requirements.txt`
+- Added pytest coverage for package imports and compatibility
+
+The package is organized as follows:
+
+```text
+school/
+├── __init__.py
+├── course.py
+├── professor.py
+└── student.py
+```
+
+Install the project tools with:
+
+```powershell
+python -m pip install -r requirements.txt
+```
+
+Import the models from the package's public interface:
+
+```powershell
+python -c "from school import Course, Student; c = Course('CS301', 'Advanced Python'); c.add_student(Student('Adham', 'S1', [90, 80])); print(c)"
+```
