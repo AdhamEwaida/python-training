@@ -222,3 +222,42 @@ Available pages:
 
 Data is stored in memory and resets whenever the Flask development server is
 restarted.
+
+### Day 13
+- Completed the Flask Student Portal v1 challenge
+- Split student storage and form validation into the `student_portal` package
+- Added stable numeric IDs for in-memory student records
+- Added optional comma-separated grades with server-side validation
+- Added individual student detail pages with grades and calculated averages
+- Linked every student in the list to their detail page
+- Extended Flask test-client coverage for registration, validation, detail
+  pages, list links, and missing students
+
+The portal structure is:
+
+```text
+student_portal/
+├── __init__.py
+├── store.py
+└── validation.py
+templates/
+├── base.html
+├── index.html
+├── register.html
+├── student_detail.html
+└── students.html
+```
+
+Available project routes:
+
+- `GET /` — homepage and navigation
+- `GET /students` — registered student list
+- `GET /students/register` — registration form
+- `POST /students/register` — validate and register a student
+- `GET /students/<student_id>` — individual details and grades
+
+Run the portal with:
+
+```powershell
+python -m flask --app app run --debug
+```

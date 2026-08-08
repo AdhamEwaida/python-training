@@ -34,6 +34,18 @@
       required
     >
 
+    <label for="grades">Grades</label>
+    <input
+      id="grades"
+      name="grades"
+      value="{{ form.get('grades', '') }}"
+      placeholder="90, 85, 78"
+      aria-describedby="grades-help"
+    >
+    <small id="grades-help">
+      Optional. Enter comma-separated numbers from 0 to 100.
+    </small>
+
     <button type="submit">Register</button>
   </form>
 {% endblock %}

@@ -9,8 +9,10 @@
     <ul>
       {% for student in students %}
         <li>
-          <strong>{{ student.name }}</strong>
-          — {{ student.email }} — {{ student.course }}
+          <a href="{{ url_for('student_detail', student_id=student.id) }}">
+            <strong>{{ student.name }}</strong>
+          </a>
+          — {{ student.course }}
         </li>
       {% endfor %}
     </ul>
