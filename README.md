@@ -261,3 +261,33 @@ Run the portal with:
 ```powershell
 python -m flask --app app run --debug
 ```
+
+### Day 14
+- Replaced the in-memory student list with a persistent SQLite database
+- Added SQLAlchemy `Student` and `Course` models with a one-to-many relationship
+- Added Flask-Migrate and an initial migration for both database tables
+- Kept student creation and detail pages backed by database queries
+- Added student update and delete routes to complete CRUD operations
+- Added a course list with enrollment counts
+- Added an idempotent `seed.py` script with demo courses and students
+- Reworked Flask tests to use a fresh in-memory SQLite database
+
+Prepare and run the database-backed portal with:
+
+```powershell
+python -m pip install -r requirements.txt
+python -m flask --app app db upgrade
+python seed.py
+python -m flask --app app run --debug
+```
+
+Database-related pages and actions:
+
+- `GET /students` — list students from SQLite
+- `POST /students/register` — create a student and course when needed
+- `GET /students/<student_id>` — read one student
+- `GET|POST /students/<student_id>/edit` — update one student
+- `POST /students/<student_id>/delete` — delete one student
+- `GET /courses` — list courses and enrollment counts
+
+The seed script is safe to run more than once; existing demo records are reused.

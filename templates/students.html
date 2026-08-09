@@ -12,7 +12,7 @@
           <a href="{{ url_for('student_detail', student_id=student.id) }}">
             <strong>{{ student.name }}</strong>
           </a>
-          — {{ student.course }}
+          — {{ student.course.name }}
         </li>
       {% endfor %}
     </ul>

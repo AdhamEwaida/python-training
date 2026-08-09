@@ -1,18 +1,47 @@
-"""Tests for the introductory Flask application."""
+"""Tests for the database-backed Flask student portal."""
+
+import os
 
 import pytest
 
-from app import app, students
+os.environ["DATABASE_URL"] = "sqlite:///:memory:"
+
+from app import app  # noqa: E402
+from seed import seed_database  # noqa: E402
+from student_portal import Course, Student, db  # noqa: E402
 
 
 @pytest.fixture
 def client():
-    """Return a Flask test client configured for testing."""
+    """Return a test client with a new in-memory database."""
     app.config.update(TESTING=True)
-    students.clear()
-    with app.test_client() as test_client:
-        yield test_client
-    students.clear()
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+        with app.test_client() as test_client:
+            yield test_client
+        db.session.remove()
+        db.drop_all()
+
+
+def add_student(
+    *,
+    name: str = "Adham",
+    email: str = "adham@example.com",
+    course_name: str = "Python",
+    grades: list[float] | None = None,
+) -> Student:
+    """Add and return one student for a route test."""
+    course = Course(name=course_name)
+    student = Student(
+        name=name,
+        email=email,
+        course=course,
+        grades=grades or [],
+    )
+    db.session.add(student)
+    db.session.commit()
+    return student
 
 
 def test_welcome_route(client):
@@ -59,7 +88,7 @@ def test_registration_form_is_available(client):
     assert b'<form method="post">' in response.data
 
 
-def test_register_student_redirects_to_student_detail(client):
+def test_register_student_persists_models_and_redirects(client):
     response = client.post(
         "/students/register",
         data={
@@ -73,19 +102,28 @@ def test_register_student_redirects_to_student_detail(client):
 
     assert response.status_code == 200
     assert b"Adham" in response.data
-    assert b"adham@example.com" in response.data
-    assert b"Python" in response.data
-    assert b"Average:" in response.data
     assert b"84.33" in response.data
-    assert students == [
-        {
-            "id": 1,
+    student = db.session.execute(db.select(Student)).scalar_one()
+    assert student.email == "adham@example.com"
+    assert student.grades == [90.0, 85.0, 78.0]
+    assert student.course.name == "Python"
+
+
+def test_registration_reuses_course_without_matching_case(client):
+    db.session.add(Course(name="Python"))
+    db.session.commit()
+
+    client.post(
+        "/students/register",
+        data={
             "name": "Adham",
             "email": "adham@example.com",
-            "course": "Python",
-            "grades": [90.0, 85.0, 78.0],
-        }
-    ]
+            "course": "python",
+        },
+    )
+
+    assert len(db.session.execute(db.select(Course)).scalars().all()) == 1
+    assert db.session.execute(db.select(Student)).scalar_one().course.name == "Python"
 
 
 def test_registration_rejects_invalid_data(client):
@@ -98,19 +136,27 @@ def test_registration_rejects_invalid_data(client):
     assert b"Name is required." in response.data
     assert b"A valid email is required." in response.data
     assert b"Course is required." in response.data
-    assert students == []
+    assert db.session.execute(db.select(Student)).scalar_one_or_none() is None
+
+
+def test_registration_rejects_duplicate_email(client):
+    add_student()
+
+    response = client.post(
+        "/students/register",
+        data={
+            "name": "Another",
+            "email": "ADHAM@example.com",
+            "course": "Flask",
+        },
+    )
+
+    assert response.status_code == 400
+    assert b"A student with this email already exists." in response.data
 
 
 def test_student_list_escapes_registered_values(client):
-    students.append(
-        {
-            "id": 1,
-            "name": "<script>alert(1)</script>",
-            "email": "safe@example.com",
-            "course": "Python",
-            "grades": [],
-        }
-    )
+    add_student(name="<script>alert(1)</script>")
 
     response = client.get("/students")
 
@@ -140,38 +186,21 @@ def test_registration_rejects_invalid_grades(client, grades, message):
 
     assert response.status_code == 400
     assert message in response.data
-    assert students == []
 
 
 def test_student_list_links_to_detail_page(client):
-    students.append(
-        {
-            "id": 7,
-            "name": "Adham",
-            "email": "adham@example.com",
-            "course": "Python",
-            "grades": [88.0],
-        }
-    )
+    student = add_student()
 
     response = client.get("/students")
 
     assert response.status_code == 200
-    assert b'href="/students/7"' in response.data
+    assert f'href="/students/{student.id}"'.encode() in response.data
 
 
 def test_student_detail_shows_profile_and_grades(client):
-    students.append(
-        {
-            "id": 1,
-            "name": "Adham",
-            "email": "adham@example.com",
-            "course": "Python",
-            "grades": [80.0, 90.0],
-        }
-    )
+    student = add_student(grades=[80.0, 90.0])
 
-    response = client.get("/students/1")
+    response = client.get(f"/students/{student.id}")
 
     assert response.status_code == 200
     assert b"adham@example.com" in response.data
@@ -184,3 +213,59 @@ def test_missing_student_detail_returns_404(client):
     response = client.get("/students/999")
 
     assert response.status_code == 404
+
+
+def test_edit_student_updates_database(client):
+    student = add_student()
+
+    response = client.post(
+        f"/students/{student.id}/edit",
+        data={
+            "name": "Adham Updated",
+            "email": "updated@example.com",
+            "course": "Flask",
+            "grades": "95, 100",
+        },
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    updated = db.session.get(Student, student.id)
+    assert updated.name == "Adham Updated"
+    assert updated.email == "updated@example.com"
+    assert updated.course.name == "Flask"
+    assert updated.grades == [95.0, 100.0]
+
+
+def test_delete_student_removes_database_record(client):
+    student = add_student()
+    student_id = student.id
+
+    response = client.post(
+        f"/students/{student_id}/delete",
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    assert b"No students have been registered yet." in response.data
+    assert db.session.get(Student, student_id) is None
+
+
+def test_course_list_shows_enrollment_count(client):
+    add_student(course_name="Python")
+
+    response = client.get("/courses")
+
+    assert response.status_code == 200
+    assert b"Python" in response.data
+    assert b"1 student(s)" in response.data
+
+
+def test_seed_database_is_repeatable(client):
+    seed_database()
+    seed_database()
+
+    students = db.session.execute(db.select(Student)).scalars().all()
+    courses = db.session.execute(db.select(Course)).scalars().all()
+    assert len(students) == 2
+    assert len(courses) == 2

@@ -1,11 +1,13 @@
-"""Public helpers for the in-memory Flask student portal."""
+"""Public database and validation helpers for the Flask student portal."""
 
-from .store import add_student, find_student, students
+from .database import db, migrate
+from .models import Course, Student
 from .validation import validate_student_form
 
 __all__ = [
-    "add_student",
-    "find_student",
-    "students",
+    "Course",
+    "Student",
+    "db",
+    "migrate",
     "validate_student_form",
 ]

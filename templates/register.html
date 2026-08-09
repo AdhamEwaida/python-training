@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Register | Student Portal{% endblock %}
+{% block title %}{{ page_title }} | Student Portal{% endblock %}
 
 {% block content %}
-  <h1>Register a Student</h1>
+  <h1>{{ page_title }}</h1>
 
   {% if errors %}
     <ul aria-label="Validation errors">
@@ -46,6 +46,6 @@
       Optional. Enter comma-separated numbers from 0 to 100.
     </small>
 
-    <button type="submit">Register</button>
+    <button type="submit">{{ submit_label }}</button>
   </form>
 {% endblock %}
