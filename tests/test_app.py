@@ -36,7 +36,7 @@ def test_application_factory_applies_test_config(app):
 
 
 def test_expected_blueprints_are_registered(app):
-    assert {"main", "students", "courses"} <= set(app.blueprints)
+    assert {"api", "main", "students", "courses"} <= set(app.blueprints)
 
 
 def add_student(
@@ -284,3 +284,175 @@ def test_seed_database_is_repeatable(client):
     courses = db.session.execute(db.select(Course)).scalars().all()
     assert len(students) == 2
     assert len(courses) == 2
+
+
+def test_api_student_list_returns_json(client):
+    student = add_student(grades=[80.0, 90.0])
+
+    response = client.get("/api/students")
+
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.json == {
+        "students": [
+            {
+                "id": student.id,
+                "name": "Adham",
+                "email": "adham@example.com",
+                "grades": [80.0, 90.0],
+                "average": 85.0,
+                "course": {"id": student.course.id, "name": "Python"},
+            }
+        ]
+    }
+
+
+def test_api_creates_student_and_returns_location(client):
+    response = client.post(
+        "/api/students",
+        json={
+            "name": "Adham",
+            "email": "adham@example.com",
+            "course": "Python",
+            "grades": [90, 85, 80],
+        },
+    )
+
+    assert response.status_code == 201
+    assert response.headers["Location"] == f"/api/students/{response.json['id']}"
+    assert response.json["average"] == 85.0
+    assert response.json["course"]["name"] == "Python"
+    assert db.session.get(Student, response.json["id"]) is not None
+
+
+def test_api_student_detail_returns_json(client):
+    student = add_student()
+
+    response = client.get(f"/api/students/{student.id}")
+
+    assert response.status_code == 200
+    assert response.json["email"] == "adham@example.com"
+
+
+@pytest.mark.parametrize(
+    ("payload", "message"),
+    [
+        ({}, "Name must be a string."),
+        (
+            {
+                "name": "Adham",
+                "email": "invalid",
+                "course": "Python",
+            },
+            "A valid email is required.",
+        ),
+        (
+            {
+                "name": "Adham",
+                "email": "adham@example.com",
+                "course": "Python",
+                "grades": "90, 80",
+            },
+            "Grades must be a list of numbers.",
+        ),
+        (
+            {
+                "name": "Adham",
+                "email": "adham@example.com",
+                "course": "Python",
+                "grades": [101],
+            },
+            "Each grade must be between 0 and 100.",
+        ),
+    ],
+)
+def test_api_rejects_invalid_student_payload(client, payload, message):
+    response = client.post("/api/students", json=payload)
+
+    assert response.status_code == 400
+    assert response.json["error"] == "Validation failed."
+    assert message in response.json["details"]
+
+
+def test_api_rejects_non_json_body(client):
+    response = client.post("/api/students", data="not json")
+
+    assert response.status_code == 400
+    assert response.json["details"] == ["Request body must be a JSON object."]
+
+
+def test_api_rejects_duplicate_email(client):
+    add_student()
+
+    response = client.post(
+        "/api/students",
+        json={
+            "name": "Another Student",
+            "email": "ADHAM@example.com",
+            "course": "Flask",
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json["details"] == ["A student with this email already exists."]
+
+
+def test_api_updates_student(client):
+    student = add_student()
+
+    response = client.put(
+        f"/api/students/{student.id}",
+        json={
+            "name": "Adham Updated",
+            "email": "updated@example.com",
+            "course": "Flask",
+            "grades": [100, 95],
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json["name"] == "Adham Updated"
+    assert response.json["grades"] == [100.0, 95.0]
+    assert response.json["course"]["name"] == "Flask"
+
+
+def test_api_deletes_student(client):
+    student = add_student()
+    student_id = student.id
+
+    response = client.delete(f"/api/students/{student_id}")
+
+    assert response.status_code == 204
+    assert response.data == b""
+    assert db.session.get(Student, student_id) is None
+
+
+@pytest.mark.parametrize("method", ["get", "put", "delete"])
+def test_api_missing_student_returns_json_404(client, method):
+    request_method = getattr(client, method)
+    kwargs = {}
+    if method == "put":
+        kwargs["json"] = {
+            "name": "Adham",
+            "email": "adham@example.com",
+            "course": "Python",
+        }
+
+    response = request_method("/api/students/999", **kwargs)
+
+    assert response.status_code == 404
+    assert response.json == {"error": "Student not found."}
+
+
+def test_api_database_failure_returns_json_500(client, monkeypatch):
+    def fail_query(*args, **kwargs):
+        from sqlalchemy.exc import SQLAlchemyError
+
+        raise SQLAlchemyError("simulated failure")
+
+    monkeypatch.setattr(db.session, "execute", fail_query)
+
+    response = client.get("/api/students")
+
+    assert response.status_code == 500
+    assert response.json == {"error": "Database operation failed."}

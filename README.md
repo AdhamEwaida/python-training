@@ -332,3 +332,38 @@ isolated while the normal Flask commands continue to work through `app.py`:
 python -m flask --app app db upgrade
 python -m flask --app app run --debug
 ```
+
+### Day 16
+- Added a JSON REST API in a dedicated `api` blueprint
+- Added endpoints to list, create, read, update, and delete students
+- Added JSON payload validation for required fields and numeric grades
+- Added consistent JSON errors for validation, missing records, and database errors
+- Reused case-insensitive course and email queries across HTML and API routes
+- Added automated API tests for success and failure responses
+- Added an importable Postman collection in `postman/`
+
+Available API endpoints:
+
+| Method | Endpoint | Result |
+| --- | --- | --- |
+| `GET` | `/api/students` | List all students |
+| `POST` | `/api/students` | Create a student |
+| `GET` | `/api/students/<student_id>` | Read one student |
+| `PUT` | `/api/students/<student_id>` | Replace student fields |
+| `DELETE` | `/api/students/<student_id>` | Delete a student |
+
+Example request body for `POST` and `PUT`:
+
+```json
+{
+  "name": "Adham",
+  "email": "adham@example.com",
+  "course": "Python",
+  "grades": [90, 85, 80]
+}
+```
+
+Start the server, then import
+`postman/Student Portal API.postman_collection.json` into Postman. Run **Create
+Student** first; its test script automatically saves the returned ID for the
+read, update, and delete requests.

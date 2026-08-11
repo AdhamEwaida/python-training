@@ -1,28 +1,13 @@
 """Student CRUD routes for the student portal."""
 
 from flask import Blueprint, abort, redirect, render_template, request, url_for
-from sqlalchemy import func
 
 from ..database import db
-from ..models import Course, Student
+from ..models import Student
+from ..services import find_student_by_email, get_or_create_course
 from ..validation import validate_student_form
 
 bp = Blueprint("students", __name__, url_prefix="/students")
-
-
-def find_course(name: str) -> Course | None:
-    """Find a course by name without treating letter case as significant."""
-    statement = db.select(Course).where(func.lower(Course.name) == name.lower())
-    return db.session.execute(statement).scalar_one_or_none()
-
-
-def get_or_create_course(name: str) -> Course:
-    """Return an existing course or add a new one to the current session."""
-    course = find_course(name)
-    if course is None:
-        course = Course(name=name)
-        db.session.add(course)
-    return course
 
 
 @bp.get("")
@@ -62,9 +47,7 @@ def register_student() -> str:
         )
 
         email = str(form_data["email"])
-        existing_student = db.session.execute(
-            db.select(Student).where(func.lower(Student.email) == email.lower())
-        ).scalar_one_or_none()
+        existing_student = find_student_by_email(email)
         if existing_student is not None:
             errors.append("A student with this email already exists.")
 
@@ -115,12 +98,7 @@ def edit_student(student_id: int) -> str:
             request.form.get("grades", ""),
         )
         email = str(form_data["email"])
-        duplicate = db.session.execute(
-            db.select(Student).where(
-                func.lower(Student.email) == email.lower(),
-                Student.id != student.id,
-            )
-        ).scalar_one_or_none()
+        duplicate = find_student_by_email(email, excluding_id=student.id)
         if duplicate is not None:
             errors.append("A student with this email already exists.")
 
