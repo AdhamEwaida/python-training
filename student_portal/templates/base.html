@@ -7,10 +7,10 @@
   </head>
   <body>
     <nav>
-      <a href="{{ url_for('welcome') }}">Home</a>
-      <a href="{{ url_for('student_list') }}">Students</a>
-      <a href="{{ url_for('register_student') }}">Register</a>
-      <a href="{{ url_for('course_list') }}">Courses</a>
+      <a href="{{ url_for('main.welcome') }}">Home</a>
+      <a href="{{ url_for('students.student_list') }}">Students</a>
+      <a href="{{ url_for('students.register_student') }}">Register</a>
+      <a href="{{ url_for('courses.course_list') }}">Courses</a>
     </nav>
     <main>
       {% block content %}{% endblock %}

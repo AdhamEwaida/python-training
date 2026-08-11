@@ -1,27 +1,42 @@
 """Tests for the database-backed Flask student portal."""
 
-import os
-
 import pytest
 
-os.environ["DATABASE_URL"] = "sqlite:///:memory:"
-
-from app import app  # noqa: E402
-from seed import seed_database  # noqa: E402
-from student_portal import Course, Student, db  # noqa: E402
+from seed import seed_database
+from student_portal import Course, Student, create_app, db
 
 
 @pytest.fixture
-def client():
-    """Return a test client with a new in-memory database."""
-    app.config.update(TESTING=True)
-    with app.app_context():
+def app():
+    """Return an application instance with an isolated database."""
+    test_app = create_app(
+        {
+            "TESTING": True,
+            "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+        }
+    )
+    with test_app.app_context():
         db.drop_all()
         db.create_all()
-        with app.test_client() as test_client:
-            yield test_client
+        yield test_app
         db.session.remove()
         db.drop_all()
+
+
+@pytest.fixture
+def client(app):
+    """Return a test client for the isolated application instance."""
+    with app.test_client() as test_client:
+        yield test_client
+
+
+def test_application_factory_applies_test_config(app):
+    assert app.testing is True
+    assert str(db.engine.url) == "sqlite:///:memory:"
+
+
+def test_expected_blueprints_are_registered(app):
+    assert {"main", "students", "courses"} <= set(app.blueprints)
 
 
 def add_student(

@@ -27,15 +27,17 @@
   {% endif %}
 
   <p>
-    <a href="{{ url_for('edit_student', student_id=student.id) }}">
+    <a href="{{ url_for('students.edit_student', student_id=student.id) }}">
       Edit student
     </a>
   </p>
   <form
     method="post"
-    action="{{ url_for('delete_student', student_id=student.id) }}"
+    action="{{ url_for('students.delete_student', student_id=student.id) }}"
   >
     <button type="submit">Delete student</button>
   </form>
-  <p><a href="{{ url_for('student_list') }}">Back to students</a></p>
+  <p>
+    <a href="{{ url_for('students.student_list') }}">Back to students</a>
+  </p>
 {% endblock %}

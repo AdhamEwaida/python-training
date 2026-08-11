@@ -1,7 +1,6 @@
 """Populate the student portal database with repeatable demo data."""
 
-from app import app
-from student_portal import Course, Student, db
+from student_portal import Course, Student, create_app, db
 
 
 def seed_database() -> None:
@@ -38,6 +37,7 @@ def seed_database() -> None:
 
 
 if __name__ == "__main__":
+    app = create_app()
     with app.app_context():
         seed_database()
         print("Demo data added successfully.")

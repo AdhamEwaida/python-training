@@ -291,3 +291,44 @@ Database-related pages and actions:
 - `GET /courses` — list courses and enrollment counts
 
 The seed script is safe to run more than once; existing demo records are reused.
+
+### Day 15
+- Introduced the `create_app()` application factory in `student_portal`
+- Moved default settings into a dedicated `Config` class
+- Split routes into `main`, `students`, and `courses` blueprints
+- Grouped student and course URLs with blueprint URL prefixes
+- Moved Jinja templates inside the application package
+- Kept `app.py` as a small Flask CLI and development-server entry point
+- Updated tests to create a fresh application instance for every test
+
+The application package is now organized as follows:
+
+```text
+student_portal/
+|-- __init__.py
+|-- config.py
+|-- database.py
+|-- models.py
+|-- validation.py
+|-- routes/
+|   |-- __init__.py
+|   |-- main.py
+|   |-- students.py
+|   `-- courses.py
+`-- templates/
+    |-- base.html
+    |-- courses.html
+    |-- hello.html
+    |-- index.html
+    |-- register.html
+    |-- student_detail.html
+    `-- students.html
+```
+
+The application factory accepts configuration overrides, which keeps testing
+isolated while the normal Flask commands continue to work through `app.py`:
+
+```powershell
+python -m flask --app app db upgrade
+python -m flask --app app run --debug
+```
