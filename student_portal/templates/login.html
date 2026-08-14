@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Log In | Student Portal{% endblock %}
+
+{% block content %}
+  <h1>Log In</h1>
+  <form method="post">
+    <p>
+      <label for="username">Username</label>
+      <input id="username" name="username" value="{{ username }}" required autofocus>
+    </p>
+    <p>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" required>
+    </p>
+    <button type="submit">Log In</button>
+  </form>
+  <p>Need an account? <a href="{{ url_for('auth.register') }}">Create one</a>.</p>
+{% endblock %}
