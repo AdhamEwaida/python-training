@@ -367,3 +367,28 @@ Start the server, then import
 `postman/Student Portal API.postman_collection.json` into Postman. Run **Create
 Student** first; its test script automatically saves the returned ID for the
 read, update, and delete requests.
+
+### Day 17
+- Added database-backed user accounts with securely hashed passwords
+- Integrated Flask-Login session management and a database user loader
+- Added account registration, login, and logout routes with flash feedback
+- Added a protected dashboard that redirects anonymous visitors to login
+- Updated navigation to reflect whether a user is signed in
+- Added automated authentication and session tests
+
+Authentication routes:
+
+| Method | Endpoint | Result |
+| --- | --- | --- |
+| `GET|POST` | `/register` | Create a portal account |
+| `GET|POST` | `/login` | Start an authenticated session |
+| `POST` | `/logout` | End the current session |
+| `GET` | `/dashboard` | View the protected dashboard |
+
+Apply the new user-table migration before trying authentication:
+
+```powershell
+python -m pip install -r requirements.txt
+python -m flask --app app db upgrade
+python -m flask --app app run --debug
+```
