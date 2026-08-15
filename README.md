@@ -392,3 +392,41 @@ python -m pip install -r requirements.txt
 python -m flask --app app db upgrade
 python -m flask --app app run --debug
 ```
+
+### Day 18
+- Added `.env` loading with `python-dotenv` for local configuration
+- Added separate development and production settings selected by `APP_ENV`
+- Read the secret key and database URL from runtime environment variables
+- Rejected the insecure default secret key when production mode starts
+- Enabled secure, HTTP-only session cookie defaults for production
+- Added a production WSGI entry point and Gunicorn dependency
+- Added automated tests for configuration selection and validation
+
+Create local settings without committing secrets:
+
+```powershell
+Copy-Item .env.example .env
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+Put the generated value in `.env`, then start the development server:
+
+```powershell
+python -m flask --app app run --debug
+```
+
+For production, configure the variables on the hosting platform and start the
+WSGI application with:
+
+```text
+APP_ENV=production
+SECRET_KEY=<strong-random-value>
+DATABASE_URL=<production-database-url>
+```
+
+```bash
+gunicorn wsgi:app
+```
+
+Gunicorn runs on Linux deployment environments. On Windows, continue using the
+Flask development server locally or run Gunicorn through WSL.

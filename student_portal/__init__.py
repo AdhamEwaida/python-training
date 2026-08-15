@@ -4,7 +4,7 @@ from typing import Any
 
 from flask import Flask
 
-from .config import Config
+from .config import get_config, get_environment_overrides, validate_config
 from .database import db, login_manager, migrate
 from .models import Course, Student, User
 from .validation import validate_student_form, validate_student_payload
@@ -13,10 +13,13 @@ from .validation import validate_student_form, validate_student_payload
 def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     """Create and configure a student portal application instance."""
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config.from_object(get_config())
+    app.config.update(get_environment_overrides())
 
     if test_config is not None:
         app.config.update(test_config)
+
+    validate_config(app.config)
 
     db.init_app(app)
     migrate.init_app(app, db)
