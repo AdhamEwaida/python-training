@@ -25,11 +25,11 @@ def seed_database() -> None:
         ).scalar_one_or_none()
         if existing is None:
             existing = Student(
-                    name=name,
-                    email=email,
-                    course=courses_by_name[course_name],
-                    grades=grades,
-                )
+                name=name,
+                email=email,
+                course=courses_by_name[course_name],
+                grades=grades,
+            )
             db.session.add(existing)
             db.session.flush()
         primary_course = courses_by_name[course_name]

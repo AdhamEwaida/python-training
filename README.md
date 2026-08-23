@@ -332,6 +332,17 @@ python -m flask --app app db upgrade
 python -m flask --app app seed
 ```
 
+### Day 23
+
+- Added session-backed CSRF protection for every server-rendered write form
+- Added validated student profile-picture uploads with generated filenames
+- Added custom HTML pages for 404 and 500 responses
+- Added user roles and profile-picture metadata to the database schema
+- Added an Alembic migration, upload exclusions, and advanced Flask tests
+
+Uploaded images are limited to 2 MiB and stored under the ignored `instance/`
+directory. Configure another location with `UPLOAD_FOLDER` when needed.
+
 ### Day 14
 - Replaced the in-memory student list with a persistent SQLite database
 - Added SQLAlchemy `Student` and `Course` models with a one-to-many relationship

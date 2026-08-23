@@ -1,7 +1,21 @@
-"""Student CRUD routes for the student portal."""
+"""Student CRUD and profile routes for the student portal."""
 
-from flask import Blueprint, abort, redirect, render_template, request, url_for
+import secrets
+from pathlib import Path
+
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    url_for,
+)
 from sqlalchemy import or_
+from werkzeug.utils import secure_filename
 
 from ..database import db
 from ..models import Course, Student
@@ -164,3 +178,35 @@ def delete_student(student_id: int) -> str:
     db.session.delete(student)
     db.session.commit()
     return redirect(url_for("students.student_list"))
+
+
+@bp.post("/<int:student_id>/profile-picture")
+def upload_profile_picture(student_id: int) -> str:
+    """Validate and store a student's profile image."""
+    student = db.get_or_404(Student, student_id)
+    upload = request.files.get("profile_picture")
+    if upload is None or not upload.filename:
+        flash("Choose an image to upload.", "error")
+        return redirect(url_for("students.student_detail", student_id=student.id))
+
+    safe_name = secure_filename(upload.filename)
+    extension = Path(safe_name).suffix.lower()
+    allowed = current_app.config["ALLOWED_IMAGE_EXTENSIONS"]
+    if extension not in allowed or not (upload.mimetype or "").startswith("image/"):
+        flash("Upload a PNG, JPEG, GIF, or WebP image.", "error")
+        return redirect(url_for("students.student_detail", student_id=student.id))
+
+    filename = f"student-{student.id}-{secrets.token_hex(8)}{extension}"
+    upload_folder = Path(current_app.config["UPLOAD_FOLDER"])
+    upload_folder.mkdir(parents=True, exist_ok=True)
+    upload.save(upload_folder / filename)
+    student.profile_picture = filename
+    db.session.commit()
+    flash("Profile picture updated successfully.", "success")
+    return redirect(url_for("students.student_detail", student_id=student.id))
+
+
+@bp.get("/profile-pictures/<path:filename>")
+def profile_picture(filename: str):
+    """Serve a generated profile-image filename from the upload directory."""
+    return send_from_directory(current_app.config["UPLOAD_FOLDER"], filename)

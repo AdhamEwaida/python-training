@@ -31,6 +31,10 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
+    CSRF_ENABLED = True
+    MAX_CONTENT_LENGTH = 2 * 1024 * 1024
+    UPLOAD_FOLDER = str(PROJECT_ROOT / "instance" / "uploads")
+    ALLOWED_IMAGE_EXTENSIONS = {".gif", ".jpeg", ".jpg", ".png", ".webp"}
 
 
 class DevelopmentConfig(Config):

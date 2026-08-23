@@ -211,17 +211,20 @@ def course_list() -> tuple[Response, int]:
         per_page=per_page,
         error_out=False,
     )
-    return jsonify(
-        {
-            "courses": [course_to_dict(course) for course in pagination.items],
-            "pagination": {
-                "page": pagination.page,
-                "pages": pagination.pages,
-                "per_page": pagination.per_page,
-                "total": pagination.total,
-            },
-        }
-    ), 200
+    return (
+        jsonify(
+            {
+                "courses": [course_to_dict(course) for course in pagination.items],
+                "pagination": {
+                    "page": pagination.page,
+                    "pages": pagination.pages,
+                    "per_page": pagination.per_page,
+                    "total": pagination.total,
+                },
+            }
+        ),
+        200,
+    )
 
 
 @bp.get("/courses/<int:course_id>")
@@ -295,9 +298,12 @@ def enrollment_list(student_id: int) -> tuple[Response, int]:
     student = db.session.get(Student, student_id)
     if student is None:
         return error_response("Student not found.", 404)
-    return jsonify(
-        {"enrollments": [enrollment_to_dict(item) for item in student.enrollments]}
-    ), 200
+    return (
+        jsonify(
+            {"enrollments": [enrollment_to_dict(item) for item in student.enrollments]}
+        ),
+        200,
+    )
 
 
 @bp.post("/students/<int:student_id>/enrollments")

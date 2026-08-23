@@ -16,6 +16,8 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(20), nullable=False, default="student")
+    profile_picture = db.Column(db.String(255), nullable=True)
 
     def set_password(self, password: str) -> None:
         """Store a secure hash instead of the original password."""
@@ -71,6 +73,7 @@ class Student(db.Model):
     name = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     grades = db.Column(db.JSON, nullable=False, default=list)
+    profile_picture = db.Column(db.String(255), nullable=True)
     course_id = db.Column(
         db.Integer,
         db.ForeignKey("courses.id"),

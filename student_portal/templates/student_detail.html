@@ -5,6 +5,31 @@
 {% block content %}
   <h1>{{ student.name }}</h1>
 
+  {% if student.profile_picture %}
+    <img
+      src="{{ url_for('students.profile_picture', filename=student.profile_picture) }}"
+      alt="Profile picture for {{ student.name }}"
+      width="160"
+    >
+  {% endif %}
+
+  <form
+    action="{{ url_for('students.upload_profile_picture', student_id=student.id) }}"
+    method="post"
+    enctype="multipart/form-data"
+  >
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    <label for="profile_picture">Profile picture</label>
+    <input
+      id="profile_picture"
+      name="profile_picture"
+      type="file"
+      accept="image/png,image/jpeg,image/gif,image/webp"
+      required
+    >
+    <button type="submit">Upload</button>
+  </form>
+
   <dl>
     <dt>Student ID</dt>
     <dd>{{ student.id }}</dd>
@@ -35,6 +60,7 @@
     method="post"
     action="{{ url_for('students.delete_student', student_id=student.id) }}"
   >
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
     <button type="submit">Delete student</button>
   </form>
   <p>

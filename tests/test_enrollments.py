@@ -78,9 +78,7 @@ def test_enrollment_can_be_deleted(client):
     db.session.add(Enrollment(student=student, course=secondary))
     db.session.commit()
 
-    response = client.delete(
-        f"/api/students/{student.id}/enrollments/{secondary.id}"
-    )
+    response = client.delete(f"/api/students/{student.id}/enrollments/{secondary.id}")
     assert response.status_code == 204
     assert db.session.execute(db.select(Enrollment)).scalar_one_or_none() is None
 
