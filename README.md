@@ -278,6 +278,31 @@ Course API endpoints:
 - `PUT /api/courses/<course_id>`
 - `DELETE /api/courses/<course_id>`
 
+### Day 20
+
+- Completed the Week 3 capstone requirements across `User`, `Student`, and
+  `Course` models
+- Added REST CRUD for user accounts with password hashing and safe serialization
+- Kept authentication secrets out of every API response
+- Added validation, case-insensitive duplicate detection, and JSON 404 responses
+- Documented the final resource endpoints and verification commands
+
+User API endpoints:
+
+- `GET /api/users`
+- `POST /api/users`
+- `GET /api/users/<user_id>`
+- `PUT /api/users/<user_id>`
+- `DELETE /api/users/<user_id>`
+
+Verify the complete project before delivery:
+
+```powershell
+python -m pytest -q
+python -m black --check .
+python -m flake8 .
+```
+
 ### Day 14
 - Replaced the in-memory student list with a persistent SQLite database
 - Added SQLAlchemy `Student` and `Course` models with a one-to-many relationship

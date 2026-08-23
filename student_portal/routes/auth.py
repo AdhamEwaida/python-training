@@ -4,20 +4,12 @@ from urllib.parse import urlsplit
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
-from sqlalchemy import func
 
 from ..database import db
 from ..models import User
+from ..services import find_user_by_username
 
 bp = Blueprint("auth", __name__)
-
-
-def find_user_by_username(username: str) -> User | None:
-    """Find a user by username without case-sensitive surprises."""
-    statement = db.select(User).where(
-        func.lower(User.username) == username.strip().lower()
-    )
-    return db.session.execute(statement).scalar_one_or_none()
 
 
 def is_safe_next_url(next_url: str | None) -> bool:

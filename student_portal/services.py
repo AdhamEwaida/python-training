@@ -3,7 +3,7 @@
 from sqlalchemy import func
 
 from .database import db
-from .models import Course, Student
+from .models import Course, Student, User
 
 
 def find_course(name: str) -> Course | None:
@@ -30,4 +30,18 @@ def find_student_by_email(
     statement = db.select(Student).where(func.lower(Student.email) == email.lower())
     if excluding_id is not None:
         statement = statement.where(Student.id != excluding_id)
+    return db.session.execute(statement).scalar_one_or_none()
+
+
+def find_user_by_username(
+    username: str,
+    *,
+    excluding_id: int | None = None,
+) -> User | None:
+    """Find a user by username without case-sensitive surprises."""
+    statement = db.select(User).where(
+        func.lower(User.username) == username.strip().lower()
+    )
+    if excluding_id is not None:
+        statement = statement.where(User.id != excluding_id)
     return db.session.execute(statement).scalar_one_or_none()
