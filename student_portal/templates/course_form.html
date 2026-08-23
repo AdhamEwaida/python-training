@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} | Student Portal{% endblock %}
+
+{% block content %}
+  <h1>{{ page_title }}</h1>
+  {% if errors %}
+    <ul aria-label="Errors">
+      {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+  <form method="post">
+    <label for="name">Course name</label>
+    <input id="name" name="name" value="{{ name }}" maxlength="120" required>
+    <button type="submit">Save Course</button>
+  </form>
+{% endblock %}

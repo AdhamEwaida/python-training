@@ -1,9 +1,10 @@
 """Student CRUD routes for the student portal."""
 
 from flask import Blueprint, abort, redirect, render_template, request, url_for
+from sqlalchemy import or_
 
 from ..database import db
-from ..models import Student
+from ..models import Course, Student
 from ..services import find_student_by_email, get_or_create_course
 from ..validation import validate_student_form
 
@@ -12,13 +13,31 @@ bp = Blueprint("students", __name__, url_prefix="/students")
 
 @bp.get("")
 def student_list() -> str:
-    """Render all students currently stored in the database."""
-    students = (
-        db.session.execute(db.select(Student).order_by(Student.name, Student.id))
-        .scalars()
-        .all()
+    """Render a searchable, paginated list of students."""
+    query = request.args.get("q", "").strip()
+    page = request.args.get("page", 1, type=int)
+    statement = db.select(Student).join(Student.course)
+    if query:
+        pattern = f"%{query}%"
+        statement = statement.where(
+            or_(
+                Student.name.ilike(pattern),
+                Student.email.ilike(pattern),
+                Course.name.ilike(pattern),
+            )
+        )
+    pagination = db.paginate(
+        statement.order_by(Student.name, Student.id),
+        page=page,
+        per_page=10,
+        error_out=False,
     )
-    return render_template("students.html", students=students)
+    return render_template(
+        "students.html",
+        students=pagination.items,
+        pagination=pagination,
+        query=query,
+    )
 
 
 @bp.get("/<int:student_id>")

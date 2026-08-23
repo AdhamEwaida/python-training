@@ -4,6 +4,7 @@
 
 {% block content %}
   <h1>Courses</h1>
+  <p><a href="{{ url_for('courses.create_course') }}">Add a course</a></p>
 
   {% if courses %}
     <ul>
@@ -11,6 +12,14 @@
         <li>
           <strong>{{ course.name }}</strong>
           — {{ course.students | length }} student(s)
+          <a href="{{ url_for('courses.edit_course', course_id=course.id) }}">Edit</a>
+          <form
+            action="{{ url_for('courses.delete_course', course_id=course.id) }}"
+            method="post"
+            style="display: inline"
+          >
+            <button type="submit">Delete</button>
+          </form>
         </li>
       {% endfor %}
     </ul>

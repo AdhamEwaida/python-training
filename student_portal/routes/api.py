@@ -6,8 +6,8 @@ from flask import Blueprint, Response, current_app, jsonify, request, url_for
 from sqlalchemy.exc import SQLAlchemyError
 
 from ..database import db
-from ..models import Student
-from ..services import find_student_by_email, get_or_create_course
+from ..models import Course, Student
+from ..services import find_course, find_student_by_email, get_or_create_course
 from ..validation import validate_student_payload
 
 bp = Blueprint("api", __name__, url_prefix="/api")
@@ -26,6 +26,28 @@ def student_to_dict(student: Student) -> dict[str, Any]:
             "name": student.course.name,
         },
     }
+
+
+def course_to_dict(course: Course) -> dict[str, Any]:
+    """Serialize a course and its primary enrollment count."""
+    return {
+        "id": course.id,
+        "name": course.name,
+        "student_count": len(course.students),
+    }
+
+
+def validate_course_payload(payload: Any) -> tuple[str, list[str]]:
+    """Validate the JSON shape used by course write endpoints."""
+    if not isinstance(payload, dict):
+        return "", ["Request body must be a JSON object."]
+    name = payload.get("name")
+    if not isinstance(name, str) or not name.strip():
+        return "", ["Course name must be a non-empty string."]
+    name = name.strip()
+    if len(name) > 120:
+        return name, ["Course name must contain at most 120 characters."]
+    return name, []
 
 
 def error_response(
@@ -136,5 +158,67 @@ def delete_student(student_id: int) -> tuple[Response, int]:
         return error_response("Student not found.", 404)
 
     db.session.delete(student)
+    db.session.commit()
+    return Response(status=204), 204
+
+
+@bp.get("/courses")
+def course_list() -> tuple[Response, int]:
+    """Return every course ordered by name."""
+    courses = db.session.execute(db.select(Course).order_by(Course.name)).scalars()
+    return jsonify({"courses": [course_to_dict(course) for course in courses]}), 200
+
+
+@bp.get("/courses/<int:course_id>")
+def course_detail(course_id: int) -> tuple[Response, int]:
+    """Return one course or a JSON 404 response."""
+    course = db.session.get(Course, course_id)
+    if course is None:
+        return error_response("Course not found.", 404)
+    return jsonify(course_to_dict(course)), 200
+
+
+@bp.post("/courses")
+def create_course() -> tuple[Response, int]:
+    """Create a course from a JSON document."""
+    name, errors = validate_course_payload(request.get_json(silent=True))
+    if name and find_course(name) is not None:
+        errors.append("A course with this name already exists.")
+    if errors:
+        return error_response("Validation failed.", 400, details=errors)
+    course = Course(name=name)
+    db.session.add(course)
+    db.session.commit()
+    response = jsonify(course_to_dict(course))
+    response.headers["Location"] = url_for("api.course_detail", course_id=course.id)
+    return response, 201
+
+
+@bp.put("/courses/<int:course_id>")
+def update_course(course_id: int) -> tuple[Response, int]:
+    """Replace a course name from a JSON document."""
+    course = db.session.get(Course, course_id)
+    if course is None:
+        return error_response("Course not found.", 404)
+    name, errors = validate_course_payload(request.get_json(silent=True))
+    duplicate = find_course(name) if name else None
+    if duplicate is not None and duplicate.id != course.id:
+        errors.append("A course with this name already exists.")
+    if errors:
+        return error_response("Validation failed.", 400, details=errors)
+    course.name = name
+    db.session.commit()
+    return jsonify(course_to_dict(course)), 200
+
+
+@bp.delete("/courses/<int:course_id>")
+def delete_course(course_id: int) -> tuple[Response, int]:
+    """Delete a course only when it has no primary students."""
+    course = db.session.get(Course, course_id)
+    if course is None:
+        return error_response("Course not found.", 404)
+    if course.students:
+        return error_response("Course has enrolled students.", 409)
+    db.session.delete(course)
     db.session.commit()
     return Response(status=204), 204

@@ -262,6 +262,22 @@ Run the portal with:
 python -m flask --app app run --debug
 ```
 
+### Day 19
+
+- Began the capstone by completing HTML and REST CRUD for courses
+- Added validation and conflict handling for course names and enrolled courses
+- Added student search across names, emails, and course names
+- Added server-side pagination to the student directory
+- Added focused capstone tests for course workflows and search
+
+Course API endpoints:
+
+- `GET /api/courses`
+- `POST /api/courses`
+- `GET /api/courses/<course_id>`
+- `PUT /api/courses/<course_id>`
+- `DELETE /api/courses/<course_id>`
+
 ### Day 14
 - Replaced the in-memory student list with a persistent SQLite database
 - Added SQLAlchemy `Student` and `Course` models with a one-to-many relationship
