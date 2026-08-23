@@ -303,6 +303,20 @@ python -m black --check .
 python -m flake8 .
 ```
 
+### Day 21
+
+- Reviewed the capstone architecture and defined the Pro Edition milestones
+- Documented the daily-delivery and production branch strategies
+- Added a DBML schema for users, students, courses, and enrollments
+- Added a concise API specification with current and planned endpoints
+- Recorded security, compatibility, migration, and deletion decisions
+
+Planning documents:
+
+- [`docs/PROJECT_PLAN.md`](docs/PROJECT_PLAN.md)
+- [`docs/schema.dbml`](docs/schema.dbml)
+- [`docs/API.md`](docs/API.md)
+
 ### Day 14
 - Replaced the in-memory student list with a persistent SQLite database
 - Added SQLAlchemy `Student` and `Course` models with a one-to-many relationship

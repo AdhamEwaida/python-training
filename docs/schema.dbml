@@ -1,0 +1,34 @@
+// Student Management Dashboard — planned Pro Edition schema
+
+Table users {
+  id integer [pk, increment]
+  username varchar(80) [not null, unique]
+  password_hash varchar(255) [not null]
+  role varchar(20) [not null, default: 'student']
+  profile_picture varchar(255)
+}
+
+Table students {
+  id integer [pk, increment]
+  name varchar(120) [not null]
+  email varchar(255) [not null, unique]
+  grades json [not null]
+  course_id integer [not null, ref: > courses.id]
+  profile_picture varchar(255)
+}
+
+Table courses {
+  id integer [pk, increment]
+  name varchar(120) [not null, unique]
+}
+
+Table enrollments {
+  id integer [pk, increment]
+  student_id integer [not null, ref: > students.id]
+  course_id integer [not null, ref: > courses.id]
+  enrolled_at datetime [not null]
+
+  indexes {
+    (student_id, course_id) [unique]
+  }
+}
