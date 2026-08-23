@@ -1,166 +1,118 @@
-"""Student CRUD routes for the student portal."""
+"""HTML CRUD routes for courses in the student portal."""
 
-from flask import Blueprint, abort, redirect, render_template, request, url_for
-from sqlalchemy import or_
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from sqlalchemy import func
 
 from ..database import db
-from ..models import Course, Student
-from ..services import find_student_by_email, get_or_create_course
-from ..validation import validate_student_form
+from ..models import Course
+from ..services import find_course
 
-bp = Blueprint("students", __name__, url_prefix="/students")
+bp = Blueprint("courses", __name__, url_prefix="/courses")
 
 
 @bp.get("")
-def student_list() -> str:
-    """Render a searchable, paginated list of students."""
+def course_list() -> str:
+    """Render a searchable, paginated course list."""
     query = request.args.get("q", "").strip()
     page = request.args.get("page", 1, type=int)
-    statement = db.select(Student).join(Student.course)
+    statement = db.select(Course)
     if query:
-        pattern = f"%{query}%"
-        statement = statement.where(
-            or_(
-                Student.name.ilike(pattern),
-                Student.email.ilike(pattern),
-                Course.name.ilike(pattern),
-            )
-        )
+        statement = statement.where(func.lower(Course.name).contains(query.lower()))
     pagination = db.paginate(
-        statement.order_by(Student.name, Student.id),
+        statement.order_by(Course.name),
         page=page,
         per_page=10,
         error_out=False,
     )
     return render_template(
-        "students.html",
-        students=pagination.items,
+        "courses.html",
+        courses=pagination.items,
         pagination=pagination,
         query=query,
     )
 
 
-@bp.get("/<int:student_id>")
-def student_detail(student_id: int) -> str:
-    """Render one student's details and grades."""
-    student = db.session.get(Student, student_id)
-    if student is None:
-        abort(404)
-
-    return render_template(
-        "student_detail.html",
-        student=student,
-        average=student.average,
-    )
+def validate_course_name(raw_name: str) -> tuple[str, list[str]]:
+    """Normalize a course name and return any validation messages."""
+    name = raw_name.strip()
+    errors = []
+    if not name:
+        errors.append("Course name is required.")
+    elif len(name) > 120:
+        errors.append("Course name must contain at most 120 characters.")
+    return name, errors
 
 
-@bp.route("/register", methods=["GET", "POST"])
-def register_student() -> str:
-    """Display and process the student registration form."""
+@bp.route("/new", methods=["GET", "POST"])
+def create_course() -> str:
+    """Create a course from an HTML form."""
+    name = request.form.get("name", "")
     if request.method == "POST":
-        form_data, errors = validate_student_form(
-            request.form.get("name", ""),
-            request.form.get("email", ""),
-            request.form.get("course", ""),
-            request.form.get("grades", ""),
-        )
-
-        email = str(form_data["email"])
-        existing_student = find_student_by_email(email)
-        if existing_student is not None:
-            errors.append("A student with this email already exists.")
-
+        normalized_name, errors = validate_course_name(name)
+        if normalized_name and find_course(normalized_name) is not None:
+            errors.append("A course with this name already exists.")
         if errors:
             return (
                 render_template(
-                    "register.html",
+                    "course_form.html",
                     errors=errors,
-                    form=request.form,
-                    page_title="Register a Student",
-                    submit_label="Register",
+                    name=name,
+                    page_title="Add Course",
                 ),
                 400,
             )
-
-        course = get_or_create_course(str(form_data["course"]))
-        student = Student(
-            name=str(form_data["name"]),
-            email=email,
-            course=course,
-            grades=list(form_data["grades"]),
-        )
-        db.session.add(student)
+        course = Course(name=normalized_name)
+        db.session.add(course)
         db.session.commit()
-        return redirect(url_for("students.student_detail", student_id=student.id))
-
+        flash("Course added successfully.", "success")
+        return redirect(url_for("courses.course_list"))
     return render_template(
-        "register.html",
+        "course_form.html",
         errors=[],
-        form={},
-        page_title="Register a Student",
-        submit_label="Register",
+        name="",
+        page_title="Add Course",
     )
 
 
-@bp.route("/<int:student_id>/edit", methods=["GET", "POST"])
-def edit_student(student_id: int) -> str:
-    """Display and process the form for updating an existing student."""
-    student = db.session.get(Student, student_id)
-    if student is None:
-        abort(404)
-
+@bp.route("/<int:course_id>/edit", methods=["GET", "POST"])
+def edit_course(course_id: int) -> str:
+    """Update an existing course name."""
+    course = db.get_or_404(Course, course_id)
     if request.method == "POST":
-        form_data, errors = validate_student_form(
-            request.form.get("name", ""),
-            request.form.get("email", ""),
-            request.form.get("course", ""),
-            request.form.get("grades", ""),
-        )
-        email = str(form_data["email"])
-        duplicate = find_student_by_email(email, excluding_id=student.id)
-        if duplicate is not None:
-            errors.append("A student with this email already exists.")
-
+        name, errors = validate_course_name(request.form.get("name", ""))
+        duplicate = find_course(name) if name else None
+        if duplicate is not None and duplicate.id != course.id:
+            errors.append("A course with this name already exists.")
         if errors:
             return (
                 render_template(
-                    "register.html",
+                    "course_form.html",
                     errors=errors,
-                    form=request.form,
-                    page_title="Edit Student",
-                    submit_label="Save Changes",
+                    name=request.form.get("name", ""),
+                    page_title="Edit Course",
                 ),
                 400,
             )
-
-        student.name = str(form_data["name"])
-        student.email = email
-        student.course = get_or_create_course(str(form_data["course"]))
-        student.grades = list(form_data["grades"])
+        course.name = name
         db.session.commit()
-        return redirect(url_for("students.student_detail", student_id=student.id))
-
+        flash("Course updated successfully.", "success")
+        return redirect(url_for("courses.course_list"))
     return render_template(
-        "register.html",
+        "course_form.html",
         errors=[],
-        form={
-            "name": student.name,
-            "email": student.email,
-            "course": student.course.name,
-            "grades": ", ".join(str(grade) for grade in student.grades),
-        },
-        page_title="Edit Student",
-        submit_label="Save Changes",
+        name=course.name,
+        page_title="Edit Course",
     )
 
 
-@bp.post("/<int:student_id>/delete")
-def delete_student(student_id: int) -> str:
-    """Delete one student from the database."""
-    student = db.session.get(Student, student_id)
-    if student is None:
-        abort(404)
-
-    db.session.delete(student)
+@bp.post("/<int:course_id>/delete")
+def delete_course(course_id: int) -> str:
+    """Delete an empty course while preserving enrolled students."""
+    course = db.get_or_404(Course, course_id)
+    if course.students or course.enrollments:
+        flash("A course with enrolled students cannot be deleted.", "error")
+        return redirect(url_for("courses.course_list"))
+    db.session.delete(course)
     db.session.commit()
-    return redirect(url_for("students.student_list"))
+    flash("Course deleted successfully.", "success")
+    return redirect(url_for("courses.course_list"))

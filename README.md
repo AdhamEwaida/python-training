@@ -317,6 +317,21 @@ Planning documents:
 - [`docs/schema.dbml`](docs/schema.dbml)
 - [`docs/API.md`](docs/API.md)
 
+### Day 22
+
+- Added an explicit `Enrollment` model with a unique student-course constraint
+- Added many-to-many enrollment list, create, and delete API endpoints
+- Added searchable, paginated course lists in HTML and JSON
+- Added a repeatable `flask seed` command that creates demo enrollments
+- Added an Alembic migration and relationship-focused tests
+
+Initialize and seed a local database with:
+
+```powershell
+python -m flask --app app db upgrade
+python -m flask --app app seed
+```
+
 ### Day 14
 - Replaced the in-memory student list with a persistent SQLite database
 - Added SQLAlchemy `Student` and `Course` models with a one-to-many relationship

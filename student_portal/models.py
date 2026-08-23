@@ -1,5 +1,7 @@
 """SQLAlchemy models for the student portal."""
 
+from datetime import datetime, timezone
+
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -49,6 +51,12 @@ class Course(db.Model):
         back_populates="course",
         lazy="select",
     )
+    enrollments = db.relationship(
+        "Enrollment",
+        back_populates="course",
+        cascade="all, delete-orphan",
+        lazy="select",
+    )
 
     def __repr__(self) -> str:
         return f"Course(id={self.id!r}, name={self.name!r})"
@@ -69,6 +77,12 @@ class Student(db.Model):
         nullable=False,
     )
     course = db.relationship("Course", back_populates="students")
+    enrollments = db.relationship(
+        "Enrollment",
+        back_populates="student",
+        cascade="all, delete-orphan",
+        lazy="select",
+    )
 
     @property
     def average(self) -> float | None:
@@ -77,3 +91,41 @@ class Student(db.Model):
 
     def __repr__(self) -> str:
         return f"Student(id={self.id!r}, email={self.email!r})"
+
+
+class Enrollment(db.Model):
+    """Connect a student to any number of courses."""
+
+    __tablename__ = "enrollments"
+    __table_args__ = (
+        db.UniqueConstraint(
+            "student_id",
+            "course_id",
+            name="uq_enrollment_student_course",
+        ),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(
+        db.Integer,
+        db.ForeignKey("students.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    course_id = db.Column(
+        db.Integer,
+        db.ForeignKey("courses.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    enrolled_at = db.Column(
+        db.DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+    )
+    student = db.relationship("Student", back_populates="enrollments")
+    course = db.relationship("Course", back_populates="enrollments")
+
+    def __repr__(self) -> str:
+        return (
+            f"Enrollment(student_id={self.student_id!r}, "
+            f"course_id={self.course_id!r})"
+        )

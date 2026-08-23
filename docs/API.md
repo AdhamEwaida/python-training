@@ -42,12 +42,21 @@ Course writes accept a non-empty `name` of at most 120 characters.
 User writes accept `username` and `password`. Passwords are hashed before
 storage and are never serialized.
 
+## Enrollments
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/students/<id>/enrollments` | List course enrollments |
+| `POST` | `/api/students/<id>/enrollments` | Enroll in a course |
+| `DELETE` | `/api/students/<id>/enrollments/<course_id>` | Remove enrollment |
+
+Enrollment writes accept an integer `course_id`. Duplicate relationships return
+`409 Conflict`.
+
 ## Planned Pro endpoints
 
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
-| `POST` | `/api/students/<id>/enrollments` | Enroll in a course |
-| `DELETE` | `/api/students/<id>/enrollments/<course_id>` | Remove enrollment |
 | `POST` | `/students/<id>/profile-picture` | Upload profile image |
 
 Pagination uses `page` and `per_page`; search uses `q`. Collection responses

@@ -6,7 +6,7 @@ from flask import Flask
 
 from .config import get_config, get_environment_overrides, validate_config
 from .database import db, login_manager, migrate
-from .models import Course, Student, User
+from .models import Course, Enrollment, Student, User
 from .validation import validate_student_form, validate_student_payload
 
 
@@ -36,11 +36,16 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     app.register_blueprint(main_bp)
     app.register_blueprint(students_bp)
     app.register_blueprint(courses_bp)
+
+    from .cli import register_commands
+
+    register_commands(app)
     return app
 
 
 __all__ = [
     "Course",
+    "Enrollment",
     "Student",
     "User",
     "create_app",

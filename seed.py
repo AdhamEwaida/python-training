@@ -1,6 +1,6 @@
 """Populate the student portal database with repeatable demo data."""
 
-from student_portal import Course, Student, create_app, db
+from student_portal import Course, Enrollment, Student, create_app, db
 
 
 def seed_database() -> None:
@@ -24,14 +24,23 @@ def seed_database() -> None:
             db.select(Student).where(Student.email == email)
         ).scalar_one_or_none()
         if existing is None:
-            db.session.add(
-                Student(
+            existing = Student(
                     name=name,
                     email=email,
                     course=courses_by_name[course_name],
                     grades=grades,
                 )
+            db.session.add(existing)
+            db.session.flush()
+        primary_course = courses_by_name[course_name]
+        enrollment = db.session.execute(
+            db.select(Enrollment).where(
+                Enrollment.student_id == existing.id,
+                Enrollment.course_id == primary_course.id,
             )
+        ).scalar_one_or_none()
+        if enrollment is None:
+            db.session.add(Enrollment(student=existing, course=primary_course))
 
     db.session.commit()
 
