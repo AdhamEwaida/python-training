@@ -343,6 +343,26 @@ python -m flask --app app seed
 Uploaded images are limited to 2 MiB and stored under the ignored `instance/`
 directory. Configure another location with `UPLOAD_FOLDER` when needed.
 
+### Day 24
+
+- Added API contract tests for students, courses, and users
+- Added a mocked database-outage test that verifies JSON errors and rollback
+- Added branch-aware coverage configuration with an enforced 80% minimum
+- Added a GitHub Actions workflow for Python 3.12 and 3.13
+- Added automated Black, Flake8, test, and coverage checks on every push
+
+Run the same verification used by CI with:
+
+```powershell
+python -m black --check .
+python -m flake8 .
+python -m pytest --cov --cov-report=term-missing --cov-report=xml
+```
+
+The coverage threshold is configured in `.coveragerc`. CI fails whenever total
+coverage drops below 80%, and the Python 3.13 job uploads `coverage.xml` as a
+workflow artifact.
+
 ### Day 14
 - Replaced the in-memory student list with a persistent SQLite database
 - Added SQLAlchemy `Student` and `Course` models with a one-to-many relationship
