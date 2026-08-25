@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: python-training-student-portal
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m flask --app app db upgrade && gunicorn wsgi:app
+    healthCheckPath: /health
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: python-training-db
+          property: connectionString
+
+databases:
+  - name: python-training-db
+    plan: free
+    databaseName: student_portal
+    user: student_portal
+    ipAllowList: []

@@ -8,7 +8,7 @@ resource-specific JSON `404` response.
 
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
-| `GET` | `/api/students` | List students |
+| `GET` | `/api/students` | List students; accepts `q`, `page`, and `per_page` |
 | `POST` | `/api/students` | Create a student |
 | `GET` | `/api/students/<id>` | Read a student |
 | `PUT` | `/api/students/<id>` | Replace editable student data |
@@ -53,11 +53,12 @@ storage and are never serialized.
 Enrollment writes accept an integer `course_id`. Duplicate relationships return
 `409 Conflict`.
 
-## Planned Pro endpoints
+## HTML upload endpoint
 
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
 | `POST` | `/students/<id>/profile-picture` | Upload profile image |
 
-Pagination uses `page` and `per_page`; search uses `q`. Collection responses
-will include pagination metadata when those parameters are supported.
+Student and course pagination use `page` and `per_page`; search uses `q`.
+Collection responses include pagination metadata when query parameters are
+provided.

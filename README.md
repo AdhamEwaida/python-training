@@ -2,6 +2,77 @@
 
 This repository contains my Python practical training exercises.
 
+## Flask Student Management Dashboard
+
+The capstone is a production-oriented Flask application for managing students,
+courses, enrollments, user accounts, grades, and profile images. It combines a
+responsive server-rendered interface with a documented JSON REST API.
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/AdhamEwaida/python-training)
+
+### Highlights
+
+- Application factory and modular Flask blueprints
+- SQLAlchemy models with Alembic migrations and PostgreSQL deployment support
+- Complete student, course, and user CRUD workflows
+- Session authentication, password hashing, roles, and CSRF protection
+- Searchable and paginated Bootstrap 5 interface
+- Fetch-powered student search with a server-rendered fallback
+- REST endpoints for students, courses, users, and enrollments
+- Profile-image validation, custom error pages, and deployment health checks
+- Black, Flake8, pytest, coverage enforcement, and GitHub Actions CI
+
+### Screenshots
+
+![Student Portal home page](docs/screenshots/home.png)
+
+![Dynamic student search](docs/screenshots/students.png)
+
+### Quick start
+
+```powershell
+py -m venv venv
+.\venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+Copy-Item .env.example .env
+python -m flask --app app db upgrade
+python -m flask --app app seed
+python -m flask --app app run --debug
+```
+
+Open `http://127.0.0.1:5000/`. Replace the example `SECRET_KEY` in `.env`
+before creating accounts.
+
+### Capstone structure
+
+```text
+student_portal/
+|-- routes/          # HTML and JSON blueprints
+|-- static/          # Dashboard CSS and asynchronous search JavaScript
+|-- templates/       # Inherited Jinja layouts, pages, and macros
+|-- cli.py           # Repeatable database seed command
+|-- config.py        # Development and production configuration
+|-- database.py      # Flask extension instances
+|-- models.py        # User, Student, Course, and Enrollment models
+|-- security.py      # CSRF protection
+|-- services.py      # Shared database operations
+`-- validation.py    # HTML and JSON validation
+migrations/          # Alembic migration history
+docs/                # API, architecture, and deployment documentation
+tests/               # Unit, integration, API, security, and UI tests
+render.yaml          # Render service and PostgreSQL Blueprint
+```
+
+### Documentation
+
+- [API reference](docs/API.md)
+- [Deployment guide](docs/DEPLOYMENT.md)
+- [Project plan](docs/PROJECT_PLAN.md)
+- [Database schema](docs/schema.dbml)
+
+The repository is deployment-ready through the Render button above. A live URL
+is created in the owner's Render workspace after the Blueprint is applied.
+
 ## Week 1 – Python Foundations
 
 ### Day 1
@@ -547,3 +618,19 @@ Search the student directory without a full-page reload by opening `/students`
 and typing a name, email address, or course into the search field. JavaScript
 requests `/api/students?q=<term>&page=1&per_page=10`; the server-rendered search
 and pagination remain available when JavaScript is disabled.
+
+### Day 26
+
+- Added a Render Blueprint for the Flask service and managed PostgreSQL database
+- Added a production PostgreSQL driver and CI-gated automatic deploys
+- Added `/health` for platform monitoring and deployment smoke tests
+- Added a professional capstone overview, feature list, quick start, and structure
+- Added browser-captured screenshots of the home page and dynamic student search
+- Expanded the API reference and added a step-by-step deployment guide
+- Added a one-click Render deployment link without committing any secrets
+- Added automated checks for the health endpoint and deployment configuration
+
+Deployment remains an account-owned action: use the **Deploy to Render** button
+near the top of this README, review the free resource limits, and apply the
+Blueprint in your Render workspace. See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)
+for verification and maintenance steps.
