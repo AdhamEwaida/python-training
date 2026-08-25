@@ -333,106 +333,7 @@ Run the portal with:
 python -m flask --app app run --debug
 ```
 
-### Day 19
-
-- Began the capstone by completing HTML and REST CRUD for courses
-- Added validation and conflict handling for course names and enrolled courses
-- Added student search across names, emails, and course names
-- Added server-side pagination to the student directory
-- Added focused capstone tests for course workflows and search
-
-Course API endpoints:
-
-- `GET /api/courses`
-- `POST /api/courses`
-- `GET /api/courses/<course_id>`
-- `PUT /api/courses/<course_id>`
-- `DELETE /api/courses/<course_id>`
-
-### Day 20
-
-- Completed the Week 3 capstone requirements across `User`, `Student`, and
-  `Course` models
-- Added REST CRUD for user accounts with password hashing and safe serialization
-- Kept authentication secrets out of every API response
-- Added validation, case-insensitive duplicate detection, and JSON 404 responses
-- Documented the final resource endpoints and verification commands
-
-User API endpoints:
-
-- `GET /api/users`
-- `POST /api/users`
-- `GET /api/users/<user_id>`
-- `PUT /api/users/<user_id>`
-- `DELETE /api/users/<user_id>`
-
-Verify the complete project before delivery:
-
-```powershell
-python -m pytest -q
-python -m black --check .
-python -m flake8 .
-```
-
-### Day 21
-
-- Reviewed the capstone architecture and defined the Pro Edition milestones
-- Documented the daily-delivery and production branch strategies
-- Added a DBML schema for users, students, courses, and enrollments
-- Added a concise API specification with current and planned endpoints
-- Recorded security, compatibility, migration, and deletion decisions
-
-Planning documents:
-
-- [`docs/PROJECT_PLAN.md`](docs/PROJECT_PLAN.md)
-- [`docs/schema.dbml`](docs/schema.dbml)
-- [`docs/API.md`](docs/API.md)
-
-### Day 22
-
-- Added an explicit `Enrollment` model with a unique student-course constraint
-- Added many-to-many enrollment list, create, and delete API endpoints
-- Added searchable, paginated course lists in HTML and JSON
-- Added a repeatable `flask seed` command that creates demo enrollments
-- Added an Alembic migration and relationship-focused tests
-
-Initialize and seed a local database with:
-
-```powershell
-python -m flask --app app db upgrade
-python -m flask --app app seed
-```
-
-### Day 23
-
-- Added session-backed CSRF protection for every server-rendered write form
-- Added validated student profile-picture uploads with generated filenames
-- Added custom HTML pages for 404 and 500 responses
-- Added user roles and profile-picture metadata to the database schema
-- Added an Alembic migration, upload exclusions, and advanced Flask tests
-
-Uploaded images are limited to 2 MiB and stored under the ignored `instance/`
-directory. Configure another location with `UPLOAD_FOLDER` when needed.
-
-### Day 24
-
-- Added API contract tests for students, courses, and users
-- Added a mocked database-outage test that verifies JSON errors and rollback
-- Added branch-aware coverage configuration with an enforced 80% minimum
-- Added a GitHub Actions workflow for Python 3.12 and 3.13
-- Added automated Black, Flake8, test, and coverage checks on every push
-
-Run the same verification used by CI with:
-
-```powershell
-python -m black --check .
-python -m flake8 .
-python -m pytest --cov --cov-report=term-missing --cov-report=xml
-```
-
-The coverage threshold is configured in `.coveragerc`. CI fails whenever total
-coverage drops below 80%, and the Python 3.13 job uploads `coverage.xml` as a
-workflow artifact.
+## Week 3 – Flask, REST APIs, and Capstone
 
 ### Day 14
 - Replaced the in-memory student list with a persistent SQLite database
@@ -602,6 +503,109 @@ gunicorn wsgi:app
 
 Gunicorn runs on Linux deployment environments. On Windows, continue using the
 Flask development server locally or run Gunicorn through WSL.
+
+### Day 19
+
+- Began the capstone by completing HTML and REST CRUD for courses
+- Added validation and conflict handling for course names and enrolled courses
+- Added student search across names, emails, and course names
+- Added server-side pagination to the student directory
+- Added focused capstone tests for course workflows and search
+
+Course API endpoints:
+
+- `GET /api/courses`
+- `POST /api/courses`
+- `GET /api/courses/<course_id>`
+- `PUT /api/courses/<course_id>`
+- `DELETE /api/courses/<course_id>`
+
+### Day 20
+
+- Completed the Week 3 capstone requirements across `User`, `Student`, and
+  `Course` models
+- Added REST CRUD for user accounts with password hashing and safe serialization
+- Kept authentication secrets out of every API response
+- Added validation, case-insensitive duplicate detection, and JSON 404 responses
+- Documented the final resource endpoints and verification commands
+
+User API endpoints:
+
+- `GET /api/users`
+- `POST /api/users`
+- `GET /api/users/<user_id>`
+- `PUT /api/users/<user_id>`
+- `DELETE /api/users/<user_id>`
+
+Verify the complete project before delivery:
+
+```powershell
+python -m pytest -q
+python -m black --check .
+python -m flake8 .
+```
+
+## Week 4 – Capstone Expansion and Deployment
+
+### Day 21
+
+- Reviewed the capstone architecture and defined the Pro Edition milestones
+- Documented the daily-delivery and production branch strategies
+- Added a DBML schema for users, students, courses, and enrollments
+- Added a concise API specification with current and planned endpoints
+- Recorded security, compatibility, migration, and deletion decisions
+
+Planning documents:
+
+- [`docs/PROJECT_PLAN.md`](docs/PROJECT_PLAN.md)
+- [`docs/schema.dbml`](docs/schema.dbml)
+- [`docs/API.md`](docs/API.md)
+
+### Day 22
+
+- Added an explicit `Enrollment` model with a unique student-course constraint
+- Added many-to-many enrollment list, create, and delete API endpoints
+- Added searchable, paginated course lists in HTML and JSON
+- Added a repeatable `flask seed` command that creates demo enrollments
+- Added an Alembic migration and relationship-focused tests
+
+Initialize and seed a local database with:
+
+```powershell
+python -m flask --app app db upgrade
+python -m flask --app app seed
+```
+
+### Day 23
+
+- Added session-backed CSRF protection for every server-rendered write form
+- Added validated student profile-picture uploads with generated filenames
+- Added custom HTML pages for 404 and 500 responses
+- Added user roles and profile-picture metadata to the database schema
+- Added an Alembic migration, upload exclusions, and advanced Flask tests
+
+Uploaded images are limited to 2 MiB and stored under the ignored `instance/`
+directory. Configure another location with `UPLOAD_FOLDER` when needed.
+
+### Day 24
+
+- Added API contract tests for students, courses, and users
+- Added a mocked database-outage test that verifies JSON errors and rollback
+- Added branch-aware coverage configuration with an enforced 80% minimum
+- Added a GitHub Actions workflow for Python 3.12 and 3.13
+- Added automated Black, Flake8, test, and coverage checks on every push
+
+Run the same verification used by CI with:
+
+```powershell
+python -m black --check .
+python -m flake8 .
+python -m pytest --cov --cov-report=term-missing --cov-report=xml
+```
+
+The coverage threshold is configured in `.coveragerc`. CI fails whenever total
+coverage drops below 80%, and the Python 3.13 job uploads `coverage.xml` as a
+workflow artifact.
 
 ### Day 25
 
