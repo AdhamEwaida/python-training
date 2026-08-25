@@ -531,3 +531,19 @@ gunicorn wsgi:app
 
 Gunicorn runs on Linux deployment environments. On Windows, continue using the
 Flask development server locally or run Gunicorn through WSL.
+
+### Day 25
+
+- Redesigned the shared Jinja layout with Bootstrap 5 and responsive navigation
+- Added reusable Jinja macros for validation messages and pagination controls
+- Added a focused custom stylesheet for the dashboard theme and empty states
+- Added asynchronous student search using the Fetch API and accessible status text
+- Extended the student API with optional search and pagination query parameters
+- Preserved the original unpaginated API response for existing clients
+- Added browser-verified home and student-directory layouts
+- Added automated coverage for the UI assets and dynamic search API contract
+
+Search the student directory without a full-page reload by opening `/students`
+and typing a name, email address, or course into the search field. JavaScript
+requests `/api/students?q=<term>&page=1&per_page=10`; the server-rendered search
+and pagination remain available when JavaScript is disabled.

@@ -1,25 +1,23 @@
 {% extends "base.html" %}
+{% from "macros/ui.html" import render_errors %}
 
 {% block title %}{{ page_title }} | Student Portal{% endblock %}
 
 {% block content %}
-  <h1>{{ page_title }}</h1>
+  <div class="card border-0 shadow-sm mx-auto" style="max-width: 48rem">
+    <div class="card-body p-4 p-md-5">
+  <h1 class="h2 mb-4">{{ page_title }}</h1>
 
-  {% if errors %}
-    <ul aria-label="Validation errors">
-      {% for error in errors %}
-        <li>{{ error }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+  {{ render_errors(errors) }}
 
   <form method="post">
     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-    <label for="name">Name</label>
-    <input id="name" name="name" value="{{ form.get('name', '') }}" required>
+    <label class="form-label" for="name">Name</label>
+    <input class="form-control mb-3" id="name" name="name" value="{{ form.get('name', '') }}" required>
 
-    <label for="email">Email</label>
+    <label class="form-label" for="email">Email</label>
     <input
+      class="form-control mb-3"
       id="email"
       name="email"
       type="email"
@@ -27,26 +25,30 @@
       required
     >
 
-    <label for="course">Course</label>
+    <label class="form-label" for="course">Course</label>
     <input
+      class="form-control mb-3"
       id="course"
       name="course"
       value="{{ form.get('course', '') }}"
       required
     >
 
-    <label for="grades">Grades</label>
+    <label class="form-label" for="grades">Grades</label>
     <input
+      class="form-control"
       id="grades"
       name="grades"
       value="{{ form.get('grades', '') }}"
       placeholder="90, 85, 78"
       aria-describedby="grades-help"
     >
-    <small id="grades-help">
+    <small class="form-text text-secondary" id="grades-help">
       Optional. Enter comma-separated numbers from 0 to 100.
     </small>
 
-    <button type="submit">{{ submit_label }}</button>
+    <div class="mt-4"><button class="btn btn-primary" type="submit">{{ submit_label }}</button></div>
   </form>
+    </div>
+  </div>
 {% endblock %}

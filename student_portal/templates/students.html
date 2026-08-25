@@ -1,41 +1,69 @@
 {% extends "base.html" %}
+{% from "macros/ui.html" import render_pagination %}
 
 {% block title %}Students | Student Portal{% endblock %}
 
 {% block content %}
-  <h1>Registered Students</h1>
-  <form method="get">
-    <label for="q">Search students</label>
-    <input id="q" name="q" value="{{ query }}">
-    <button type="submit">Search</button>
-  </form>
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <p class="text-primary fw-semibold mb-1">Directory</p>
+      <h1 class="mb-0">Registered Students</h1>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('students.register_student') }}">Add student</a>
+  </div>
 
-  {% if students %}
-    <ul>
-      {% for student in students %}
-        <li>
-          <a
-            href="{{ url_for('students.student_detail', student_id=student.id) }}"
-          >
-            <strong>{{ student.name }}</strong>
-          </a>
-          — {{ student.course.name }}
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>No students have been registered yet.</p>
-  {% endif %}
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <form
+        class="row g-2 align-items-end mb-4"
+        method="get"
+        id="student-search-form"
+        data-student-search
+        data-api-url="{{ url_for('api.student_list') }}"
+        data-detail-url="{{ url_for('students.student_detail', student_id=0) }}"
+      >
+        <div class="col-md">
+          <label class="form-label" for="q">Search students</label>
+          <input class="form-control" id="q" name="q" value="{{ query }}" placeholder="Name, email, or course" autocomplete="off">
+        </div>
+        <div class="col-md-auto">
+          <button class="btn btn-outline-primary w-100" type="submit">Search</button>
+        </div>
+      </form>
 
-  {% if pagination.pages > 1 %}
-    <nav aria-label="Student pages">
-      {% if pagination.has_prev %}
-        <a href="{{ url_for('students.student_list', q=query, page=pagination.prev_num) }}">Previous</a>
-      {% endif %}
-      <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
-      {% if pagination.has_next %}
-        <a href="{{ url_for('students.student_list', q=query, page=pagination.next_num) }}">Next</a>
-      {% endif %}
-    </nav>
-  {% endif %}
+      <p class="visually-hidden" id="student-search-status" aria-live="polite"></p>
+      <div id="student-results">
+        {% if students %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-4">
+              <thead><tr><th>Name</th><th>Email</th><th>Course</th><th>Average</th></tr></thead>
+              <tbody>
+                {% for student in students %}
+                  <tr>
+                    <td><a class="fw-semibold" href="{{ url_for('students.student_detail', student_id=student.id) }}">{{ student.name }}</a></td>
+                    <td>{{ student.email }}</td>
+                    <td>{{ student.course.name }}</td>
+                    <td>{{ "%.2f" | format(student.average) if student.average is not none else "—" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="empty-state text-center rounded-3 p-5">
+            <h2 class="h5">No students have been registered yet.</h2>
+            <p class="text-secondary mb-0">Add the first student or try another search.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <div id="student-pagination">
+        {{ render_pagination(pagination, 'students.student_list', query, 'Student pages') }}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/student-search.js') }}" defer></script>
 {% endblock %}

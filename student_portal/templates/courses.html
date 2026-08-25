@@ -1,47 +1,55 @@
 {% extends "base.html" %}
+{% from "macros/ui.html" import render_pagination %}
 
 {% block title %}Courses | Student Portal{% endblock %}
 
 {% block content %}
-  <h1>Courses</h1>
-  <p><a href="{{ url_for('courses.create_course') }}">Add a course</a></p>
-  <form method="get">
-    <label for="q">Search courses</label>
-    <input id="q" name="q" value="{{ query }}">
-    <button type="submit">Search</button>
-  </form>
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <p class="text-primary fw-semibold mb-1">Catalog</p>
+      <h1 class="mb-0">Courses</h1>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('courses.create_course') }}">Add a course</a>
+  </div>
 
-  {% if courses %}
-    <ul>
-      {% for course in courses %}
-        <li>
-          <strong>{{ course.name }}</strong>
-          — {{ course.students | length }} student(s)
-          <a href="{{ url_for('courses.edit_course', course_id=course.id) }}">Edit</a>
-          <form
-            action="{{ url_for('courses.delete_course', course_id=course.id) }}"
-            method="post"
-            style="display: inline"
-          >
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <button type="submit">Delete</button>
-          </form>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>No courses have been added yet.</p>
-  {% endif %}
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <form class="row g-2 align-items-end mb-4" method="get">
+        <div class="col-md">
+          <label class="form-label" for="q">Search courses</label>
+          <input class="form-control" id="q" name="q" value="{{ query }}" placeholder="Course name">
+        </div>
+        <div class="col-md-auto">
+          <button class="btn btn-outline-primary w-100" type="submit">Search</button>
+        </div>
+      </form>
 
-  {% if pagination.pages > 1 %}
-    <nav aria-label="Course pages">
-      {% if pagination.has_prev %}
-        <a href="{{ url_for('courses.course_list', q=query, page=pagination.prev_num) }}">Previous</a>
+      {% if courses %}
+        <div class="list-group list-group-flush mb-4">
+          {% for course in courses %}
+            <div class="list-group-item px-0 py-3 d-flex flex-column flex-md-row justify-content-between gap-3">
+              <div>
+                <h2 class="h5 mb-1">{{ course.name }}</h2>
+                <span class="text-secondary">{{ course.students | length }} student(s)</span>
+              </div>
+              <div class="d-flex gap-2 align-items-center">
+                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('courses.edit_course', course_id=course.id) }}">Edit</a>
+                <form action="{{ url_for('courses.delete_course', course_id=course.id) }}" method="post">
+                  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state text-center rounded-3 p-5">
+          <h2 class="h5">No courses have been added yet.</h2>
+          <p class="text-secondary mb-0">Create the first course or try another search.</p>
+        </div>
       {% endif %}
-      <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
-      {% if pagination.has_next %}
-        <a href="{{ url_for('courses.course_list', q=query, page=pagination.next_num) }}">Next</a>
-      {% endif %}
-    </nav>
-  {% endif %}
+
+      {{ render_pagination(pagination, 'courses.course_list', query, 'Course pages') }}
+    </div>
+  </div>
 {% endblock %}

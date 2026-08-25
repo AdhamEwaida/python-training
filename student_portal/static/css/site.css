@@ -1,0 +1,53 @@
+:root {
+  --portal-navy: #12233f;
+  --portal-blue: #315efb;
+  --portal-surface: #f5f7fb;
+}
+
+body {
+  color: var(--portal-navy);
+}
+
+.bg-primary,
+.btn-primary {
+  background-color: var(--portal-blue) !important;
+}
+
+.btn-primary {
+  border-color: var(--portal-blue) !important;
+}
+
+.hero-panel {
+  background:
+    radial-gradient(circle at 92% 12%, rgb(49 94 251 / 18%), transparent 34%),
+    linear-gradient(135deg, #fff, #edf2ff);
+}
+
+.hero-mark {
+  display: grid;
+  width: min(15rem, 62vw);
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 32% 68% 64% 36% / 43% 34% 66% 57%;
+  background: linear-gradient(145deg, var(--portal-blue), #6f42c1);
+  box-shadow: 0 1.5rem 3rem rgb(49 94 251 / 25%);
+  color: #fff;
+  font-size: 4rem;
+  font-weight: 800;
+  letter-spacing: -0.08em;
+}
+
+.empty-state {
+  background: var(--portal-surface);
+  border: 1px dashed #b9c3d6;
+}
+
+.card,
+.form-control,
+.btn {
+  border-radius: 0.75rem;
+}
+
+.table > :not(caption) > * > * {
+  padding-block: 0.85rem;
+}

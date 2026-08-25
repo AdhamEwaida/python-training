@@ -3,6 +3,7 @@
 from typing import Any
 
 from flask import Blueprint, Response, current_app, jsonify, request, url_for
+from sqlalchemy import or_
 from sqlalchemy.exc import SQLAlchemyError
 
 from ..database import db
@@ -107,13 +108,44 @@ def handle_database_error(error: SQLAlchemyError) -> tuple[Response, int]:
 
 @bp.get("/students")
 def student_list() -> tuple[Response, int]:
-    """Return all students ordered by name and ID."""
-    students = (
-        db.session.execute(db.select(Student).order_by(Student.name, Student.id))
-        .scalars()
-        .all()
+    """Return students, with optional search and pagination for the UI."""
+    if not request.args:
+        students = (
+            db.session.execute(db.select(Student).order_by(Student.name, Student.id))
+            .scalars()
+            .all()
+        )
+        return jsonify({"students": [student_to_dict(s) for s in students]}), 200
+
+    query = request.args.get("q", "").strip()
+    page = max(request.args.get("page", 1, type=int), 1)
+    per_page = min(max(request.args.get("per_page", 20, type=int), 1), 100)
+    statement = db.select(Student).join(Student.course)
+    if query:
+        pattern = f"%{query}%"
+        statement = statement.where(
+            or_(
+                Student.name.ilike(pattern),
+                Student.email.ilike(pattern),
+                Course.name.ilike(pattern),
+            )
+        )
+    pagination = db.paginate(
+        statement.order_by(Student.name, Student.id),
+        page=page,
+        per_page=per_page,
+        error_out=False,
     )
-    return jsonify({"students": [student_to_dict(s) for s in students]}), 200
+    payload: dict[str, Any] = {
+        "students": [student_to_dict(student) for student in pagination.items],
+        "pagination": {
+            "page": pagination.page,
+            "pages": pagination.pages,
+            "per_page": pagination.per_page,
+            "total": pagination.total,
+        },
+    }
+    return jsonify(payload), 200
 
 
 @bp.get("/students/<int:student_id>")

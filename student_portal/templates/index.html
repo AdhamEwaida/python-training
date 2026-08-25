@@ -3,9 +3,41 @@
 {% block title %}Home | Student Portal{% endblock %}
 
 {% block content %}
-  <h1>Welcome to the Student Portal</h1>
-  <p>
-    Register students, browse the student list, and view individual profiles
-    with course and grade details.
-  </p>
+  <section class="hero-panel rounded-4 p-4 p-md-5 shadow-sm overflow-hidden">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-7">
+        <span class="badge text-bg-primary mb-3">Student Management Dashboard</span>
+        <h1 class="display-5 fw-bold">Welcome to the Student Portal</h1>
+        <h2 class="h4 fw-normal text-secondary">Keep student records organized in one place.</h2>
+        <p class="lead text-secondary">
+          Register students, manage courses, track grades, and explore records
+          through a responsive dashboard and REST API.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <a class="btn btn-primary btn-lg" href="{{ url_for('students.student_list') }}">Browse students</a>
+          <a class="btn btn-outline-primary btn-lg" href="{{ url_for('students.register_student') }}">Add a student</a>
+        </div>
+      </div>
+      <div class="col-lg-5" aria-hidden="true">
+        <div class="hero-mark mx-auto">SP</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="row g-3 mt-3" aria-label="Portal features">
+    {% for title, description in [
+      ('Students', 'Search profiles, review grades, and update records.'),
+      ('Courses', 'Create courses and monitor enrollment totals.'),
+      ('REST API', 'Integrate through structured JSON resource endpoints.')
+    ] %}
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body p-4">
+            <h2 class="h5">{{ title }}</h2>
+            <p class="text-secondary mb-0">{{ description }}</p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </section>
 {% endblock %}
