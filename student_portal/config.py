@@ -16,9 +16,11 @@ load_dotenv(PROJECT_ROOT / ".env")
 
 
 def normalize_database_url(url: str) -> str:
-    """Return a SQLAlchemy-compatible database URL."""
+    """Return a SQLAlchemy URL that explicitly uses the installed driver."""
     if url.startswith("postgres://"):
-        return f"postgresql://{url.removeprefix('postgres://')}"
+        url = f"postgresql://{url.removeprefix('postgres://')}"
+    if url.startswith("postgresql://"):
+        return f"postgresql+psycopg://{url.removeprefix('postgresql://')}"
     return url
 
 

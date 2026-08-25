@@ -68,7 +68,20 @@ def test_unknown_environment_is_rejected(monkeypatch):
         create_app()
 
 
-def test_legacy_postgres_url_is_normalized():
-    assert normalize_database_url("postgres://host/database") == (
-        "postgresql://host/database"
+@pytest.mark.parametrize(
+    "database_url",
+    [
+        "postgres://user:password@host/database",
+        "postgresql://user:password@host/database",
+    ],
+)
+def test_render_postgres_url_uses_installed_psycopg_driver(database_url):
+    assert normalize_database_url(database_url) == (
+        "postgresql+psycopg://user:password@host/database"
     )
+
+
+def test_explicit_postgres_driver_is_preserved():
+    database_url = "postgresql+psycopg://user:password@host/database"
+
+    assert normalize_database_url(database_url) == database_url
