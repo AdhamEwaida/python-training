@@ -8,6 +8,12 @@ The capstone is a production-oriented Flask application for managing students,
 courses, enrollments, user accounts, grades, and profile images. It combines a
 responsive server-rendered interface with a documented JSON REST API.
 
+### Live demo
+
+Visit the deployed portal: [python-training-student-portal.onrender.com](https://python-training-student-portal.onrender.com)
+
+The Render free instance may take up to a minute to wake after inactivity.
+
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/AdhamEwaida/python-training)
 
 ### Highlights
@@ -67,6 +73,7 @@ render.yaml          # Render service and PostgreSQL Blueprint
 
 - [API reference](docs/API.md)
 - [Deployment guide](docs/DEPLOYMENT.md)
+- [Final review checklist](docs/FINAL_REVIEW.md)
 - [Project plan](docs/PROJECT_PLAN.md)
 - [Database schema](docs/schema.dbml)
 
@@ -638,3 +645,13 @@ Deployment remains an account-owned action: use the **Deploy to Render** button
 near the top of this README, review the free resource limits, and apply the
 Blueprint in your Render workspace. See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)
 for verification and maintenance steps.
+
+### Day 27
+
+- Completed the final review of the application, migrations, tests, and live deployment
+- Added a public live-demo link so visitors can try the deployed portal directly
+- Documented a repeatable release checklist for local and Render verification
+- Confirmed the production service deploys from the CI-verified main branch
+
+Use [`docs/FINAL_REVIEW.md`](docs/FINAL_REVIEW.md) before a release or after a
+platform configuration change.
