@@ -1,6 +1,7 @@
 venv/
 __pycache__/
 *.pyc
+Python training material.txt
 .env
 instance/
 .test_uploads/
